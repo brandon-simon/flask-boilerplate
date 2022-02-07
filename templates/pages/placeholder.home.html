@@ -1,10 +1,177 @@
 {% extends 'layouts/main.html' %}
-{% block title %}Home{% endblock %}
+{% block title %}Yield Curve Today{% endblock %}
 {% block content %}
 
-<div class="page-header">
-  <h1>Sticky footer with fixed navbar</h1>
-</div>
-<p class="lead">Pin a fixed-height footer to the bottom of the viewport in desktop browsers with this custom HTML and CSS. A fixed navbar has been added within <code>#wrap</code> with <code>padding-top: 60px;</code> on the <code>.container</code>.</p>
+<header class="entry-header has-text-align-center header-footer-group" style="padding: 6rem 0">
+	<div class="entry-header-inner section-inner medium">
+		<h1 class="entry-title">Today&#8217;s Rates</h1>
+    <div class="wp-block-coblocks-posts__date" style="font-size: 0.8em;">
+      <span style="margin-right: 0.5rem;">Updated:</span>
+      <time datetime="" >February 2, 20/22</time>
+    </div>
+	</div><!-- .entry-header-inner -->
+</header><!-- .entry-header -->
+
+<div class="post-inner thin ">
+  <div class="entry-content">
+    <div class="wp-block-columns" style="margin-top:0rem; margin-bottom: 3rem;">
+      <div class="wp-block-column">
+        <h4 class="has-text-align-right has-custom-weight" style="font-weight:normal; margin-top: 0rem; margin-bottom: 0rem;">Slope Indicator:</h4>
+      </div>
+      <div class="wp-block-column" style="background-color: #E35335; border-radius: 1rem; margin-right: var(--wp--style--block-gap,2em);">
+        <h5 class="has-text-align-center" style="margin-top: 0rem; margin-bottom: 0rem; color: white; margin-top: 0.5rem;">Flattening</h5>      
+      </div>
+    </div>
+    <div class="wp-block-columns alignwide" style="margin-top: 0rem !important;">
+      <div class="wp-block-column has-primary-color has-text-color">
+        <h3 class="has-text-align-center" id="us-2yr">US 2YR</h3>
+        <h4 class="has-text-align-center has-custom-weight" id="1-15" style="font-weight:normal">1.15%</h4>
+        <p class="has-text-align-center" id="2-02" style="color:green">+1.52%</p>
+      </div>
+      <div class="wp-block-column">
+        <h3 class="has-text-align-center" id="us-5yr">US 5YR</h3>
+        <h4 class="has-text-align-center has-custom-weight" id="1-54" style="font-weight:normal">1.54%</h4>
+        <p class="has-text-align-center" id="2-02" style="color:green">+1.52%</p>
+      </div>
+      <div class="wp-block-column">
+        <h3 class="has-text-align-center" id="us-10yr">US 10YR</h3>
+        <h4 class="has-text-align-center has-custom-weight" id="1-76" style="font-weight:normal">1.76%</h4>
+        <p class="has-text-align-center" id="2-02" style="color:green">+1.52%</p>
+      </div>
+      <div class="wp-block-column">
+        <h3 class="has-text-align-center" id="us-30yr">US 30YR</h3>
+        <h4 class="has-text-align-center has-custom-weight" id="2-02" style="font-weight:normal">2.02%</h4>
+        <p class="has-text-align-center" id="2-02" style="color:green">+1.52%</p>
+      </div>
+    </div>
+    <!-- Create a div where the graph will take place -->
+    <div id="my_dataviz"></div>
+    
+    <hr class="wp-block-separator">
+    <div class="wp-container-61fc28ce7a493 wp-block-group alignwide">
+      <div class="wp-block-group__inner-container">
+        <h2 class="alignwide has-text-align-center" id="what-s-a-yield-curve" style="font-size:48px;line-height:1.1">What&#8217;s a Yield Curve?</h2>
+        <p>Yields are set everyday by the Federal Reserve. </p>
+      </div>
+    </div>
+    <hr class="wp-block-separator">
+    <div class="wp-container-61fc28ce7a8c8 wp-block-group">
+      <div class="wp-block-group__inner-container">
+        <h2 class="has-text-align-center" id="the-predictive-nature-of-yield-curves">The Predictive Nature of Yield Curves</h2>
+        <p>Yield curves have an uncanny ability to predict recessions. </p>
+        <figure class="wp-block-table"><table><tbody><tr><td>Recession</td><td>Yield Curve Inversion (2/10yr spread)</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
+      </div>
+    </div>
+    <h3 class="has-text-align-center" id="why-does-this-happen">Why does this happen?</h3>
+    <p>As investors get pessimsic about the current outlook of the economy, they will begin bidding up the shorter-duration bonds while simutantionly selling longer-duration bonds. This leads to the yield curve &#8220;flattening&#8221; until eventually inversion. Typically, the delay between __ and __ is 1 year with a max of 3 years (1927) and minimum of 3 months (2019).</p>
+  </div><!-- .entry-content -->
+</div><!-- .post-inner -->
+
+<script>
+
+  // set the dimensions and margins of the graph
+  var margin = {top: 10, right: 30, bottom: 30, left: 60},
+      width = 600 - margin.left - margin.right,
+      height = 400 - margin.top - margin.bottom;
+  
+  // append the svg object to the body of the page
+  var svg = d3.select("#my_dataviz")
+    .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+  
+  //Read the data
+  d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_IC.csv",function(data) {
+    
+    console.log(data);
+    // Add X axis --> it is a date format
+    var x = d3.scaleLinear()
+      .domain([1,100])
+      .range([ 0, width ]);
+    svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+  
+    // Add Y axis
+    var y = d3.scaleLinear()
+      .domain([0, 13])
+      .range([ height, 0 ]);
+    svg.append("g")
+      .call(d3.axisLeft(y));
+  
+    // This allows to find the closest X index of the mouse:
+    var bisect = d3.bisector(function(d) { return d.x; }).left;
+  
+    // Create the circle that travels along the curve of chart
+    var focus = svg
+      .append('g')
+      .append('circle')
+        .style("fill", "none")
+        .attr("stroke", "black")
+        .attr('r', 8.5)
+        .style("opacity", 0)
+  
+    // Create the text that travels along the curve of chart
+    var focusText = svg
+      .append('g')
+      .append('text')
+        .style("opacity", 0)
+        .attr("text-anchor", "left")
+        .attr("alignment-baseline", "middle")
+  
+    // Add the line
+    svg
+      .append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 1.5)
+      .attr("d", d3.line()
+        .x(function(d) { return x(d.x) })
+        .y(function(d) { return y(d.y) })
+        )
+  
+    // Create a rect on top of the svg area: this rectangle recovers mouse position
+    svg
+      .append('rect')
+      .style("fill", "none")
+      .style("pointer-events", "all")
+      .attr('width', width)
+      .attr('height', height)
+      .on('mouseover', mouseover)
+      .on('mousemove', mousemove)
+      .on('mouseout', mouseout);
+  
+  
+    // What happens when the mouse move -> show the annotations at the right positions.
+    function mouseover() {
+      focus.style("opacity", 1)
+      focusText.style("opacity",1)
+    }
+  
+    function mousemove() {
+      // recover coordinate we need
+      var x0 = x.invert(d3.mouse(this)[0]);
+      var i = bisect(data, x0, 1);
+      selectedData = data[i]
+      focus
+        .attr("cx", x(selectedData.x))
+        .attr("cy", y(selectedData.y))
+      focusText
+        .html("x:" + selectedData.x + "  -  " + "y:" + selectedData.y)
+        .attr("x", x(selectedData.x)+15)
+        .attr("y", y(selectedData.y))
+      }
+    function mouseout() {
+      focus.style("opacity", 0)
+      focusText.style("opacity", 0)
+    }
+  
+  })
+  
+  </script>
 
 {% endblock %}
